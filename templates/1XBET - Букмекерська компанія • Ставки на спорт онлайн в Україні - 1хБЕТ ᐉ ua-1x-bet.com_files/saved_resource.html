@@ -1,0 +1,84 @@
+
+<!-- saved from url=(0035)https://cookconfig.net/user/config/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script type="text/javascript">
+
+    function GetCookieGlobal(name) {
+        var arg = name + "=",
+            alen = arg.length,
+            clen = document.cookie.length,
+            i = 0;
+        while (i < clen) {
+            var j = i + alen;
+            if (document.cookie.substring(i, j) == arg)
+                return getCookieValGlobal(j);
+            i = document.cookie.indexOf(" ", i) + 1;
+            if (i == 0) break;
+        }
+        return null;
+    }
+
+    function getCookieValGlobal(offset) {
+        var endstr = document.cookie.indexOf(";", offset);
+        if (endstr == -1)
+            endstr = document.cookie.length;
+        return unescape(document.cookie.substring(offset, endstr));
+    }
+
+    function SetCookieGlobal(name, value, expires, path, domain, secure) {
+        document.cookie = name + "=" + escape(value) +
+            ((expires) ? "; expires=" + expires.toGMTString() : "") +
+            ((path) ? "; path=" + path : "") +
+            ((domain) ? "; domain=" + domain : "") +
+            ((secure) ? "; secure" : "");
+    }
+
+    function DeleteCookieGlobal(name, path, domain) {
+        if (GetCookieGlobal(name)) {
+            document.cookie = name + "=" +
+                ((path) ? "; path=" + path : "") +
+                ((domain) ? "; domain=" + domain : "") +
+                "; expires=Thu, 01-Jan-70 00:00:01 GMT";
+        }
+    }
+
+    function FixCookieDateGlobal(date) {
+        var base = new Date(0),
+            skew = base.getTime();
+
+        if (skew > 0) date.setTime(date.getTime() - skew);
+    }
+
+    function expDateGlobal(days) { // пилим дату для кук
+        var expdate = new Date();
+
+        FixCookieDateGlobal(expdate);
+        expdate.setTime(expdate.getTime() + (days * 24 * 60 * 60 * 1000));
+
+        return expdate;
+    }
+
+    function listener(event) {
+        switch (event.data.act) {
+            case 'set':
+                SetCookieGlobal(event.data.name, (event.data.val || ''), expDateGlobal(event.data.day || 365), '/');
+                answer({name: event.data.name, val: event.data.val}, event.data.domain);
+                break;
+            case 'get':
+                answer({name: event.data.name, val: GetCookieGlobal(event.data.name)}, event.data.domain);
+                break;
+            case 'del':
+                DeleteCookieGlobal(event.data.name, '/', '');
+                answer({name: event.data.name, val: ''}, event.data.domain);
+                break;
+        }
+    }
+
+    if (window.addEventListener) {
+        window.addEventListener("message", listener);
+    }
+
+    function answer(data, domain) {
+        parent.postMessage(data, domain);
+    }
+</script>
+</head><body data-new-gr-c-s-check-loaded="14.983.0"></body></html>

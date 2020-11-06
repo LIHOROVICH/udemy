@@ -1,0 +1,1 @@
+$(window).on("load",function(){var a=$(".js-slider-market"),b=Number(Core.cookie.get("is_rtl"))===2;if(a.length){a.show();a.owlCarousel({items:1,loop:true,dots:$(".js-market-slider-item").length>1,singleItem:true,autoplay:true,rtl:b,autoplayTimeout:5000})}});

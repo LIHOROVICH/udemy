@@ -1,0 +1,1 @@
+function getCurrDate(a){a=a||false;var b=null;$.ajax({url:"getservertime",type:"get",async:false,dataType:"text",success:function success(c){b=a?Number(c)*1000:new Date(Number(c)*1000)}});return b}function getRefId(){return typeof IFRAME_REF_ID!=="undefined"?IFRAME_REF_ID:window.CONFIG.ref_id}

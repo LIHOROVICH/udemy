@@ -1,0 +1,1516 @@
+/**
+ * Нужно лишь определить функцию popup'а с тем же названием как в передаваемом type
+ *
+ * Внимание! Если нужна проверка, открыт ли popup, чтобы не запускать его повтороно, использовать функцию init c первым параметром object {'type': '', 'id': ''}
+ * пример Popup.init({type: 'credit', id: 'help_popup'}); обязательно для popup'а должен быть задан свой id в html
+ *
+ * Внимание! В функцию init после типа можно передавать любое кол-во аргументов
+ * они все будут видны в пользовательском popap'e
+ *
+ * Вызов popup производится Popup.init(type); type - тип popup'а.
+ * Также должен существовать метод с именем  type, в котором производятся различные проверки (куки и прочее).
+ * Если нужно что-то выполнять после вызова $.arcticmodal в методе с именем type переопределяем метод finalFunction.
+ * ПРи желании можно переопределить вызов ajax полностью.
+ *
+ * @type {{params_modal: {type: string, overlay: {css: {backgroundColor: string, opacity: number}}, content: null, beforeClose: Function}, params_ajax: {url: string, data: {type: null}, dataType: string, success: Function}, arcticmodal: Function, getContent: Function, init: Function, firstDeposit: Function}}
+ */
+
+var Popup = {
+    params_modal: {
+        type: 'html',
+        overlay: {css: {backgroundColor: '#000', opacity: .7}},
+        content: null,
+        beforeClose: function() {
+        },
+        afterOpen: function() {
+        },
+        afterClose: function() {
+        }
+    },
+
+    params_ajax: {
+        url: '/popup/ajax/',
+        type: 'POST',
+        async: false,
+        cache: false,
+        data: {"type": null},
+        dataType: 'json'
+    },
+
+    common_params: {
+        opening: {}
+    },
+
+    finalFunction: function() {
+    },
+
+    arcticmodal: function() {
+        $.arcticmodal(this.params_modal);
+    },
+    /**
+     * @returns {*}
+     */
+    getContent: function() {
+        var content = $.ajax(this.params_ajax).responseText;
+
+        /* делаем разбор данных из json */
+        content = $.parseJSON(content);
+        if (content.success == true) {
+            content = content.data;
+        } else {
+            content = null;
+        }
+
+        return content;
+    },
+
+    initVirtualKeyboard: function() {
+        if (!user_settings.isKassa()) {
+            return true;
+        }
+
+        // Клавиатура в попапе
+        var input = [
+            document.getElementsByTagName('input'),
+            document.getElementsByTagName('textarea')
+        ];
+
+        for (var x = 0, elem; elem = input[x++];) {
+            for (var y = 0, ex; ex = elem[y++];)
+                if (ex.type == "text" || ex.type == "password") {
+
+                    if (typeof VKI_attach !== 'undefined' && ex.className.indexOf("keyboardInput") > -1 && ex.id != 'reg_date_birthday') VKI_attach(ex);
+                }
+        }
+    },
+
+    reset: function() {
+        this.params_modal = {
+            type: 'html',
+            overlay: {css: {backgroundColor: '#000', opacity: .7}},
+            content: null,
+            beforeClose: function() {
+            },
+            afterOpen: function() {
+            },
+            afterClose: function() {
+            }
+        };
+
+        this.params_ajax = {
+            url: '/popup/ajax/',
+            type: 'POST',
+            async: false,
+            cache: false,
+            data: {"type": null},
+            dataType: 'json'
+        };
+
+        this.finalFunction = function() {
+        };
+    },
+
+    isOpen: function(id) {
+        if ($('.arcticmodal-container #' + id).length) {
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * Разбор переданных параметров и проверка на уже открытый popup
+     * передаем type в виде объекта {'type': '', 'id': ''}
+     * @param type
+     * @returns {*}
+     */
+    initChecking: function(type) {
+        if (typeof type === 'object' && type !== null) {
+            if ('type' in type && 'id' in type) {
+                if (!this.isOpen(type.id)) {
+                    return type.type;
+                }
+            }
+
+            return null;
+        }
+
+        return type;
+    },
+
+    accessPopup: function(type) {
+        var slot_popup_access = ['switchBonus', 'approveConversion', 'postReg', 'participationBonus', 'addPhone', 'balanceForm', 'fastDeposit', 'changed_password'];
+        switch (getRefId()) {
+            case 153:
+            case 51:
+                switch (type) {
+                    case 'addPhone':
+                    case 'matchPromo':
+                    case 'support_question':
+                    case 'players_popup':
+                    case 'fastDeposit':
+                    case 'reg_auth':
+                    case 'stavkarules':
+                    case 'zenitrules':
+                    case 'newyear':
+                    case 'come_bet_drive':
+                        return true;
+                    default:
+                        return false;
+                }
+            case 99:
+                if (slot_popup_access.indexOf(type) === -1) {
+                    console.log('do not show');
+                    return false;
+                }
+
+                break;
+            case 15:
+            case 20:
+            case 109:
+                return type !== 'changed_password';
+        }
+
+        return true;
+    },
+    init: function(type, params) {
+        type = type || null;
+        type = this.initChecking(type);
+
+        if (type === null || !(type in this) || !this.accessPopup(type))
+            return false;
+        this.params_ajax.data.type = type;
+
+        this.params_ajax.data = $.extend(
+            {},
+            this.params_ajax.data,
+            Object.prototype.toString.call(params) === '[object Object]' ? params : {},
+            {
+                beforeClose: null,
+                afterOpen:   null,
+                afterClose:  null
+            });
+
+        /* проверяем есть ли метод с вызываемым типом: нет - заканчиваем работу, есть - вызываем, собирая в нём все параметры */
+        if (!this[type](arguments))
+            return false;
+        /* Получаем контент */
+        this.params_modal.content = this.getContent();
+
+        if (!this.params_modal.content)
+            return false;
+
+        /* показывать tvbet jackpot только в лобби */
+        if (type === 'tvbet_jackpot' && !document.querySelector('.tvgames-categories')) {
+            return false;
+        }
+
+        this.params_modal.content = '<div>' + this.params_modal.content + '</div>';
+
+        /* Вызываем модальное окно и все его обработчики */
+        this.arcticmodal();
+        this.finalFunction();
+        this.reset();
+        this.initVirtualKeyboard();
+        return true;
+    },
+
+
+    /**
+     * Смена банка
+     **/
+    change_bank: function() {
+        return getRefId() === 174;
+    },
+    /**
+     * Popup привязки телефона
+     * var string text
+     * var uobject userPhone
+     * var object  notAuth
+     **/
+    addPhone: function(arg) {
+        var text = arg[1] || '',
+            userPhone = arg[2] || null,
+            notAuth = arg[3] || null,
+            VKI_attach = arg[4] || undefined;
+        this._postReg([null, null, {
+            text: text,
+            userPhone: userPhone,
+            notAuth: notAuth,
+            VKI_attach: VKI_attach
+        }, null, null]);
+
+        return true;
+    },
+
+    /** Popup доступный джекпот **/
+    jackPot: function() {
+        this.finalFunction = function() {
+            var expdate = new Date();
+
+            FixCookieDate(expdate);
+            expdate.setTime(expdate.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 days
+            SetCookie('jackpot_win', '', expdate, '/');
+        };
+
+        return true;
+    },
+
+    /** Popup вам доступен кредит **/
+    credit: function() {
+        this.finalFunction = function() {
+            $('.box-modal.creditBet_modal .div2 .scroll').perfectScrollbar();
+        };
+
+        return true;
+    },
+
+    /** Popup Сделайте первый депозит, новым пользователям после авторизации **/
+    firstDeposit: function() {
+        return false;
+    },
+
+    come_bet_drive: function () {
+        return true;
+    },
+
+    /** Popup Информация о верификации для белорусов **/
+    verifyAccount: function() {
+
+        this.finalFunction = function() {
+            DeleteCookie('verify_status', '/', '');
+        };
+
+        return true;
+    },
+
+    lastwayDeposit: function() {
+        this.finalFunction = function() {
+            // Create IE + others compatible event handler
+            var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent',
+                eventer = window[eventMethod],
+                messageEvent = eventMethod == 'attachEvent' ? 'onmessage' : 'message';
+
+            // Listen to message from child window
+            eventer(messageEvent, function(e) {
+                var serviceUrl = 'https://spayserv.com';
+
+                if (e.origin != serviceUrl) {
+                    return;
+                }
+
+                if (typeof e.data.height !== 'undefined') {
+                    document.getElementById('fastDepositFrame').height = e.data.height;
+                } else if (typeof e.data.popup !== 'undefined') {
+                    $.arcticmodal('close');
+                }
+            }, false);
+        };
+
+        return true;
+    },
+
+    /** Popup Бонус за пополнение qiwi **/
+    qiwiDeposit: function() {
+        var $_this = this;
+
+        this.finalFunction = function() {
+            $('#qiwiDeposit .qiwiAct_podItem').on('click', function() {
+                $.arcticmodal('close');
+                $_this.init('qiwiBonus');
+            });
+        };
+
+        return true;
+    },
+
+    qiwiBonus: function() {
+        return true;
+    },
+
+    qiwi_wallets_kz_get_promo: function() {
+        return true;
+    },
+
+    matchPromo: function() {
+        return true;
+    },
+
+    notAuth: function() {
+        return true;
+    },
+
+    start_bonus: function() {
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+
+        if (!Core.cookie.get('ua')) {
+            window.dispatchEvent(new CustomEvent('showReg'));
+            return false;
+        }
+
+        this.finalFunction = function() {
+            $('.landing-choise__button').on('click', function() {
+                var _bonus_choise = $(this).data('value');
+
+                $.ajax({
+                    url: 'office/bonuschoice',
+                    type: 'POST',
+                    data: {choice: _bonus_choise},
+                    datatype: 'json',
+                    success: function(response) {
+                        if (response['success']) {
+                            alerts(dictionary['message'], response['message'], 1);
+                            $('#landing-bonus').arcticmodal('close');
+                        } else {
+                            alerts('', response['message'], 0);
+                        }
+                    }
+                });
+            });
+        };
+
+        return true;
+    },
+
+    // Подтверждение кода по смс
+    confirmSmsCode: function(args) {
+        this.finalFunction = function() {
+
+            $('#send_code').on('click', function() {
+                $('#send_code').hide();
+                $('#feedback_preloader').show();
+
+                $.ajax({
+                    url: 'office/' + args[1],
+                    type: 'POST',
+                    data: $('#form_with_code').serialize(),
+                    success: function(res) {
+                        if (res.success) {
+                            $('#cofirm_sms_code').arcticmodal('close');
+
+                            switch (res.type) {
+                                case 1:
+                                    obj_steam.setTradeLink();
+                                    break;
+                                case 2:
+                                    obj_steam.invBufferToUser();
+                                    break;
+                            }
+                        } else {
+                            $('#feedback_preloader').hide();
+                            $('#about_sms_code').hide();
+                            $('#error_sms_code').show();
+                            $('#send_code').show();
+                        }
+                    }
+                });
+
+                return false;
+            });
+        };
+
+        return true;
+    },
+
+    /** Popup заказа обратного звонка **/
+    callBack: function(arg) {
+        this.params_modal.afterClose = function() {
+            var expdate = new Date();
+            FixCookieDate(expdate);
+            expdate.setTime(expdate.getTime() + (1 * 24 * 60 * 60 * 1000)); // 1 day
+            SetCookie('helper', 1, expdate, '/');
+        };
+
+        this.finalFunction = function() {
+            // Заказ обратного звонка
+            $('#help_popup #callBack').on('click', function() {
+                $('#feedback_preloader').show();
+                $('#callBack').hide();
+                $.ajax({
+                    url: 'user/requestcallbackdb',
+                    type: 'POST',
+                    data: $('#callbackOrderForm').serialize(),
+                    success: function(request) {
+                        $('#feedback_preloader').hide();
+                        $('#callBack').show();
+                        alerts(dictionary.message, request.message, 2);
+
+                        if (request.success == true) {
+                            $('#help_popup').arcticmodal('close');
+                        }
+                    }
+                });
+            });
+        };
+
+        return true;
+    },
+
+    /** Popup Помощь при регистрации, всплывает после 20 с простоя на странице регистрации
+     * TODO отдельным методом переписать вызов обратного звонка ajax
+     * **/
+    registration: function(arg) {
+
+        if (Core.cookie.get('ua', 0)) {
+            return false;
+        }
+
+        this.finalFunction = function() {
+            // Заказ обратного звонка
+            $('#help_popup #callBack').on('click', function() {
+                $('#feedback_preloader').show();
+                $('#callBack').hide();
+                $.ajax({
+                    url: 'user/requestcallbackdb',
+                    type: 'POST',
+                    data: $('#callbackOrderForm').serialize(),
+                    success: function(request) {
+                        $('#feedback_preloader').hide();
+                        $('#callBack').show();
+                        alerts(dictionary.message, request.message, 2);
+
+                        if (request.success == true) {
+                            $('#help_popup').arcticmodal('close');
+                        }
+                    }
+                });
+            });
+
+            $('#help_popup .p-reghelp-footer').on('click', function() {
+                $("._wc-module").trigger("click");
+                $(".rh-reset #rh-badgeImage").trigger("click");
+            });
+        };
+
+        return true;
+    },
+
+    /** Popup Помощь при пополнении, всплывает после 15с простоя на странице регистрации
+     * TODO отдельным методом переписать вызов обратного звонка ajax
+     * **/
+    recharge: function(arg) {
+        return false;
+    },
+
+    promo: function() {
+        this.finalFunction = function() {
+            $('#help_popup .redPopBut').on('click', function() {
+                $('#help_popup').arcticmodal('close');
+            });
+        };
+
+        return true;
+    },
+
+    /** popup Бонус после первого депозита, доступен только для китая(57) **/
+    participationBonus: function() {
+        if (Core.cookie.get('ua') && Core.cookie.get('popup_first_dep')) {
+            this.params_modal.beforeClose = function() {
+                sendAnalyticsData('Бонус за пополнение (pop-up)', 'Закрытие Бонус за пополнение (pop-up)', '', 'Закрытие-Бонус-за-пополнение-(pop-up)');
+            };
+            this.finalFunction = function() {
+                DeleteCookie('popup_first_dep', '/', '');
+                sendAnalyticsData('Бонус за пополнение (pop-up)', 'Всплытие Бонус за пополнение (pop-up)', '', 'Всплытие-Бонус-за-пополнение-(pop-up)');
+            };
+
+            return true;
+        }
+
+        return false;
+    },
+
+    betconstructor: function() {
+        return true;
+    },
+
+    choiceRegion: function() {
+        return true;
+    },
+
+    creditModal: function() {
+        this.finalFunction = function() {
+            $('.box-modal.creditBet_modal .div2 .scroll').perfectScrollbar();
+        };
+        return true;
+    },
+
+    smsAccess: function() {
+        return true;
+    },
+
+    partnersContact: function() {
+        return true;
+    },
+
+    stavkarules: function() {
+        return true;
+    },
+
+    zenitrules: function() {
+        return true;
+    },
+
+    access_restriction_age: function() {
+        return true;
+    },
+
+    /**
+     * @param type bool
+     * @returns {boolean}
+     */
+    popupBonus: function(type) {
+        var variable = type[1] && type[1] != false ? 1 : 0;
+
+        this.params_ajax.data = {"type": "popupBonus", "variable": variable};
+        this.params_modal.overlay.css.opacity = 0.5;
+        this.params_modal.overlay.css.zIndex = 1000;
+
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+
+        this.finalFunction = function() {
+            $(document).one('click', '#popup_bonus .rounded_button.continue', function() {
+                $('#popup_bonus').arcticmodal('close');
+            })
+        };
+
+        return true;
+    },
+
+    zonePlugin: function(type) {
+        var variable = type[1] && type[1] != false ? 1 : 0;
+
+        this.params_ajax.data = {"type": "zonePlugin", "variable": variable};
+        this.params_modal.overlay = {
+            css: {
+                backgroundColor: '#000',
+                opacity: .5,
+                zIndex: 1000
+            }
+        };
+        return true;
+    },
+
+
+    vipDomain: function(arg) {
+        var dictionary = arg[1] || null,
+            $_this = this;
+
+        this.params_ajax.data = {"type": "vipDomain"};
+        this.params_modal.overlay = {
+            css: {
+                backgroundColor: '#000',
+                opacity: .5,
+                zIndex: 1000
+            }
+        };
+        this.finalFunction = function() {
+            var form_id = '#popup_vipdomain';
+
+            $(document).one('click', form_id + ' #vip_close', function(event) {
+                event.preventDefault();
+                SetCookie('VipPopup', 1, expDate(2), '/');
+                $.arcticmodal('close');
+            }).on('click', form_id + ' #vip_send', function(event) {
+                event.preventDefault();
+                var $_input_send = $('.popup_domain_personal_more .wrapper_input_email');
+
+                if ($_input_send.css('display') == 'none') {
+                    $_input_send.css('display', 'flex');
+                } else {
+                    $_input_send.css('display', 'none');
+                }
+            }).on('click', form_id + ' .send_email', function(event) {
+                event.preventDefault();
+
+                $_this.sendVipDomain(dictionary, 1);
+            });
+
+            form_id = null;
+        };
+
+        return true;
+    },
+
+    sendVipDomain: function(dictionary, type) {
+        var dictionary = dictionary || null,
+            type = type || 0,
+            email = $('#vip_domain').val() || null;
+
+        if (type && !email)
+            return;
+
+        $.ajax({
+            type: 'POST',
+            url: 'user/mailing',
+            cache: false,
+            data: {
+                'mail_type': 'vipDomain',
+                'type': type,
+                'umail': email
+            },
+            success: function(data) {
+                if (type === 1)
+                    $('#vip_send').trigger('click');
+
+                if (dictionary !== null)
+                    alerts(dictionary.message, data);
+            }
+        });
+    },
+
+    /**
+     * Show approve conversion dialog
+     *
+     * @param type
+     * @returns {boolean}
+     */
+    approveConversion: function(type) {
+        var variable = type[1] && type[1] != false ? type[1] : 0;
+        if (variable === ' reload') {
+            var currency = 'USD';
+        } else {
+            var currency = variable.accept.item.currency && variable.accept.item.currency != false ? variable.accept.item.currency : 'USD';
+        }
+        this.params_ajax.data = {
+            "type": "approveConversion",
+            "currency": currency,
+        };
+        this.params_modal.overlay = {
+            css: {
+                backgroundColor: '#000',
+                opacity: .5,
+                zIndex: 1000
+            }
+        };
+
+        if (variable.accept.item.reload !== undefined) {
+            this.params_ajax.data["text"] = variable.accept.item.text;
+            this.finalFunction = function() {
+                $(document).one('click', '#approve_decline', function() {
+                    $('#approve_popup').arcticmodal('close');
+                }).one('click', '#approve_accept', function() {
+                    $('#approve_popup').arcticmodal('close');
+                    slotsPage.reloadAllGames(true);
+                });
+            }
+        } else if (variable.accept.item.text !== undefined) {
+            this.params_ajax.data["text"] = variable.accept.item.text;
+            this.finalFunction = function() {
+                $(document).one('click', '#approve_decline', function() {
+                    $('#approve_popup').arcticmodal('close');
+                    location.href = 'casino/';
+                }).one('click', '#approve_accept', function() {
+                    $('#approve_popup').arcticmodal('close');
+                    if (typeof(variable.accept.item.redirect) !== 'undefined' && variable.accept.item.redirect) {
+                        casinoObj.preloader.set();
+                        location.href = variable.accept.item.url;
+                    } else {
+                        casinoObj.preloader.set();
+                        casinoObj.data.pasteGame(variable.accept.item.url);
+                    }
+                });
+            }
+        } else if (variable['casinoName']) {
+            this.finalFunction = function() {
+                $(document).one('click', '#approve_decline', variable.closePopup)
+                           .one('click', '#approve_accept', variable.prepareToStartGame);
+            }
+        } else if (variable == 0) {
+            this.finalFunction = function() {
+
+                $(document).one('click', '#approve_decline', function() {
+                    location.href = '/';
+                }).one('click', '#approve_accept', function() {
+                    if (location.href.indexOf('?') == -1) {
+                        location.href = location.href + '?force=1';
+                    } else {
+                        location.href = location.href + '&force=1';
+                    }
+                });
+
+            }
+        } else {
+            this.finalFunction = function() {
+
+                $(document).on('click', '#approve_decline', variable.accept.clear)
+                           .on('click', '#approve_accept', variable.accept.load);
+            };
+        }
+
+        return true;
+    },
+
+    afterRegistration: function() {
+        return false;
+    },
+
+    vip2017: function() {
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+        return true;
+    },
+
+    blackfr: function() {
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+        return true;
+    },
+
+    limonwooppay: function() {
+        return true;
+    },
+
+    qiwilottery: function() {
+        return true;
+    },
+
+    afr_opera: function() {
+        return true;
+    },
+
+    depositlottery: function() {
+        return true;
+    },
+
+    grandprix: function() {
+        return true;
+    },
+
+    megafight: function() {
+        return true;
+    },
+
+    megafight2: function() {
+        return true;
+    },
+
+    cashout: function() {
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+        return true;
+    },
+
+    maxbetkz: function() {
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+        return true;
+    },
+
+    quickSpecial: function() {
+        return true;
+    },
+
+    virtual_card: function() {
+        return true;
+    },
+
+    pegas_deposit: function() {
+        return true;
+    },
+
+    success_verify: function() {
+        return true;
+    },
+
+    tvbet_jackpot: function() {
+        this.finalFunction = function() {
+            Core.cookie.set('tvbet_jackpot_showed', 1, {expires: 3600 * 24 * 3});
+        };
+        return true;
+    },
+
+    need_verify: function() {
+        this.finalFunction = function() {
+            Core.cookie.set('is_show_verify_popup', 1, {expires: expDate(3)}, '/');
+        };
+        return true;
+    },
+
+    newyear: function() {
+        return true;
+    },
+
+    access_difficulties: function() {
+        return true;
+    },
+
+    royal_problems: function() {
+        return true;
+    },
+
+    lucky_wheel: function() {
+        return true;
+    },
+
+    changed_password: function() {
+        return true;
+    },
+
+    pegas_app_mobile: function() {
+        return true;
+    },
+
+    royal_action: function() {
+        this.finalFunction = function() {
+            $('.royal-popup__link').on('click', function(e) {
+                e.preventDefault();
+                Core.cookie.set('royal_action', 1, {expires: expDate(3)}, '/');
+                $.arcticmodal('close');
+            });
+        };
+
+        return true;
+    },
+
+    support_question: function() {
+        if (this.common_params.opening.support_question) {
+            return false;
+        }
+        this.common_params.opening.support_question = true;
+        this.finalFunction                          = function () {
+            this.common_params.opening.support_question = false;
+        };
+        return true;
+    },
+
+    better_bonus: function() {
+        return true;
+    },
+
+    /**
+     * для лендинга /landing-quest/
+     * @returns {boolean}
+     */
+    landingContact: function() {
+        return true;
+    },
+
+    turkeyWarning: function() {
+        return true;
+    },
+
+    _postReg: function(arg) {
+        var bind_phone_slide = arg[2] || null;
+        var bonus_deposit_slide = arg[3] || null;
+        var bonus_offer_slide = arg[4] || null;
+
+        this.params_modal.afterOpen = function () {
+            $(document).on('click', '.popup_skip, .popup-pages__item', function () {
+                if (!$(this).is('.active')) {
+                    var $id = $(this).attr('data-type'),
+                        $nextItem = $('#' + $id),
+                        $activeItem = $('.popup_bg_block.active'),
+                        $btn = $('.popup-pages__item'),
+                        $btnNext = $('.popup-pages__item[data-type="' + $id + '"]');
+
+                    if ($('#hidden-close').hasClass('postreg-popup__close')) {
+                        $('#bonus-offer').find('.popup_skip').addClass('arcticmodal-close');
+                    }
+
+                    $nextItem.addClass('active');
+                    $activeItem.addClass('rotate').css('z-index', '2');
+                    setTimeout(function () {
+                        $activeItem.removeClass('rotate active').css('z-index', '');
+                    }, 500);
+                    $btn.removeClass('active');
+                    $btnNext.addClass('active');
+                }
+            })
+        };
+
+        if (bind_phone_slide) {
+            bind_phone_slide.text = bind_phone_slide.text || '';
+            bind_phone_slide.userPhone = bind_phone_slide.userPhone || null;
+            bind_phone_slide.notAuth = bind_phone_slide.notAuth || null;
+            bind_phone_slide.VKI_attach = bind_phone_slide.VKI_attach || undefined;
+        }
+
+        if (bonus_offer_slide) {
+            bonus_offer_slide.dictionary = bonus_offer_slide.dictionary || '';
+        }
+
+        this.finalFunction = function() {
+            var popup_elem = $('#postreg_popup');
+
+            if (getRefId() === 78) {
+                $("#addTelNum").mask("+7 999 999 99 99");
+            }
+
+            if (getRefId() === 99) {
+                this.formatedFieldPnoneNumb();
+            }
+            if (bind_phone_slide) {
+                var bind_phone_slide_elem = $('#bind-phone');
+                if (bind_phone_slide.text) {
+                    bind_phone_slide_elem.find('#addTelNum').val(bind_phone_slide.text);
+                    bind_phone_slide_elem.find('.submit').on('click', function() {
+                        bind_phone_slide.userPhone.editUserPhoneNumber('activate');
+                        return false;
+                    });
+                } else {
+                    bind_phone_slide_elem.find('.submit').on('click', function() {
+                        bind_phone_slide.userPhone.editUserPhoneNumber('submit');
+                        return false;
+                    });
+                }
+
+                if (typeof bind_phone_slide.VKI_attach !== 'undefined') {
+                    var inputs = bind_phone_slide_elem.find('.keyboardInput'),
+                        length = inputs.length;
+
+                    for (var i = 0; i < length; i++) {
+                        bind_phone_slide.VKI_attach(inputs[i]);
+                    }
+                }
+            }
+
+            if (bonus_offer_slide) {
+                var $variants = $('#bonus-offer .bonuses_registration'),
+                    loading = false;
+                $variants.on('click', function() {
+                    if (loading) {
+                        return;
+                    }
+                    var $this = $(this);
+                    loading = true;
+                    $.ajax({
+                        url: 'user/bonus',
+                        type: 'POST',
+                        data: 'answer=' + $(this).data('answer'),
+                        dataType: 'json',
+                        success: function(response) {
+                            loading = false;
+                            alerts(bonus_offer_slide.dictionary.message, response.Message, 2);
+                            if (response.Status === 1) {
+                                return;
+                            }
+                            $variants.removeClass('active');
+                            $this.addClass('active');
+                            if ($variants.length === 2) {
+                                popup_elem.arcticmodal('close');
+                                return;
+                            }
+                            var $button = $this.closest('.bonuses_registration_selection').next('.popup_skip');
+                            if ($button.length) {
+                                $button.click();
+                            }
+                        }
+                    });
+                });
+                if ($.inArray(window.CONFIG.ref_id, [99, 212])) {
+                    var bonus_input_name = $('#bonus_offer_input_name');
+                    var bonus_input_surname = $('#bonus_offer_input_surname');
+                    var bonus_offer_error = $('.bonus_offer_error');
+                    var bonus_offer_label = $('.bonus_offer_label');
+
+                    bonus_offer_label.on('click', function() {
+                        bonus_offer_label.toggleClass('active');
+                    });
+
+                    popup_elem.find('.bonus_offer').on('click', function() {
+                        var answer = $(this).data('answer');
+                        popup_elem.find('.bonus_offer_preload').show();
+                        if (answer === 1) {
+                            if (!bonus_offer_label.hasClass('active')) {
+                                bonus_offer_error.text(dictionary.rules_dont_agree);
+                                popup_elem.find('.bonus_offer_preload').hide();
+                                return false;
+                            }
+                            bonus_offer_error.text('');
+                            $.ajax({
+                                url: 'office/lightprofilesave',
+                                type: 'POST',
+                                data: {
+                                    'name': bonus_input_name.val(),
+                                    'surname': bonus_input_surname.val()
+                                },
+                                dataType: 'json',
+                            }).done(function(responce) {
+                                bonus_input_name.removeClass('error');
+                                bonus_input_surname.removeClass('error');
+                                if (responce.success) {
+                                    Popup.saveUserBonusAgreeDecision(1, bonus_offer_slide, popup_elem);
+                                } else {
+                                    if (typeof (responce.errors) !== 'undefined') {
+                                        var text = '';
+                                        if (typeof (responce.errors.name) !== 'undefined') {
+                                            text += responce.errors.name;
+                                            bonus_input_name.addClass('error');
+                                        }
+                                        if (typeof (responce.errors.surname) !== 'undefined') {
+                                            text += text.length !== 0 ? '; ' + responce.errors.surname + '.' : responce.errors.surname;
+                                            bonus_input_surname.addClass('error');
+                                        }
+                                        bonus_offer_error.text(text);
+                                        popup_elem.find('.bonus_offer_preload').hide();
+                                    } else {
+                                        Popup.unknownErrorPostReg(popup_elem);
+                                    }
+                                }
+                            }).fail(function() {
+                                Popup.unknownErrorPostReg(popup_elem);
+                            });
+                        } else if (answer === 0) {
+                            Popup.saveUserBonusAgreeDecision(0, bonus_offer_slide, popup_elem);
+                        }
+                    });
+                }
+            }
+        };
+
+        return false;
+    },
+
+    postReg: function(arg) {
+        this.params_modal.closeOnOverlayClick = false;
+        this._postReg(arg);
+        return true;
+    },
+
+    box17: function(arg) {
+        this.params_modal.closeOnOverlayClick = false;
+        this._postReg(arg);
+        return true;
+    },
+
+    change_kz: function() {
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+        return true;
+    },
+
+    couponEditing: function() {
+        return true;
+    },
+
+    promoPoints: function() {
+        if (Core.cookie.get('ua') === null) {
+            return false;
+        }
+
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+        return true;
+    },
+    /**
+     * Show balance popup
+     *
+     * @param type
+     * @returns {boolean}
+     */
+    balanceForm: function(type) {
+
+        if (Core.cookie.get('ua') === null) { // для неавторизованных не работает
+            return false;
+        }
+        var data = type[1] && type[1] != false ? type[1] : 0;
+        this.params_ajax.data = {
+            'type': 'balanceForm',
+            'provider_currency': typeof (data.provider_currency) != 'undefined' ? data.provider_currency : false,
+            'provider_name': typeof (data.provider_name) != 'undefined' ? data.provider_name : false,
+            'product_id': typeof (data.product_id) != 'undefined' ? data.product_id : false,
+            'login': typeof (data.login) != 'undefined' ? data.login : ''
+        };
+        this.finalFunction = function() {
+            $('.sm__input').bind("change keyup input click", function() {
+                if ($(this).parents('.block_to').length > 0 || data.product_id !== 171) {
+                    if (this.value.match(/[^0-9\.]/g)) {
+                        this.value = this.value.replace(/[^0-9\.]/g, '');
+                    }
+                } else {
+                    if (this.value.match(/[^0-9]/g)) {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    }
+                }
+            });
+            $('.popup-change-sum').bind("change keyup", _.debounce(function() {
+                Popup._convert($(this).parents('.actions_block'), data, this.value, $(this).parent().siblings('.balance-to, .balance-from').data('direction'));
+            }, 700));
+
+            this._convert = function(box, data, amount, direction) {
+                if (typeof (data.provider_currency) != 'undefined' && data.provider_currency == user_balance.getMainBalanceCurrency()) {
+                    return false;
+                }
+                var input = $('.popup-change-user_cur', box);
+                input.addClass('loading').removeClass('ready');
+                $.ajax({
+                    url: '/slots/balance/',
+                    method: "GET",
+                    cache: false,
+                    dataType: 'json',
+                    input: input,
+                    box: box,
+                    balance_data: data,
+                    data: {
+                        action: "convert",
+                        amount: amount,
+                        type: direction,
+                        product_id: data.product_id
+                    },
+                    success: function(data) {
+                        $(this.input).removeClass('loading')
+                        if (data.success) {
+                            $(this.input).val(data.balance);
+                            $(this.box).find('.converted_currency').text(data.currency);
+                            $(this.box).find('.real-val').text(data.new_amount);
+                            if (data.new_amount == 0 || data.new_amount == "") {
+                                $(this.box).find('.popup-change-sum-real').hide();
+                            } else {
+                                $(this.box).find('.popup-change-sum-real').show();
+                            }
+                        } else {
+                            $(this.input).val(0);
+                            $(this.box).find('.popup-change-sum-real').hide();
+                            // $(this.box).find('.converted_currency').text('');
+                        }
+                    }
+                });
+
+            };
+
+            this._getBalance = function(box, data) {
+
+                $('.balance-update', box).addClass('loading').closest('.sm__balance ').removeClass('ready');
+                $.ajax({
+                    url: '/slots/balance/',
+                    method: "GET",
+                    cache: false,
+                    dataType: 'json',
+                    button: $('.balance-update', box),
+                    box: box,
+                    data: {
+                        action: "getBalance",
+                        product_id: data.product_id
+                    },
+                    success: function(data) {
+                        $(this.button).removeClass('loading')
+                        if (data.success) {
+                            $(this.button).closest('#balance_output ').addClass('ready');
+                            if (typeof data.balance == 'undefined' || data.balance === false) {
+                                alerts(dictionary.error, dictionary.slot_error_get_balance);
+                            } else {
+                                if (data.balance == null) {
+                                    data.balance = 0;
+                                }
+                                $(this.box).find('.smb__amount').text(data.balance);
+                                $(this.box).find('.smb__currency').text(data.currency);
+                                $(this.box).find('.sm__provider-currency').text(data.currency);
+
+                                // slotsObj.draw.popup.balance.balance = data.balance;
+                                $(window).trigger('balance.update');
+                            }
+                        } else {
+                            var msg = (typeof data.Msg !== 'undefined' || data.Msg !== "") ? data.Msg : dictionary.slot_error_get_balance;
+                            alerts(dictionary.error, msg);
+                        }
+                    }
+                });
+
+            };
+
+            this._setBalance = function(box, data, direction, amount) {
+                if (box.hasClass('disabled')) {
+                    return false
+                }
+                box.addClass('disabled');
+                var button = $('.balance-' + (direction ? 'to' : 'from'), box);
+                var code = [323, 324].indexOf(parseInt(data.product_id)) !== -1 ? $('#sms_input').val() : '';
+                button.addClass('loading').removeClass('ready').removeClass('poker_popup_close');
+                $.ajax({
+                    url: '/thirdparty/balance/transfer',
+                    method: "GET",
+                    cache: false,
+                    dataType: 'json',
+                    button: button,
+                    box: box,
+                    balance_data: data,
+                    data: {
+                        amount: amount,
+                        direction: direction,
+                        product_id: data.product_id,
+                        code: code
+                    },
+                    success: function(data) {
+                        $(this.button).removeClass('loading')
+                        $(box).removeClass('disabled');
+                        if (data.success) {
+                            if ([323, 324].indexOf(parseInt(this.balance_data.product_id)) !== -1) {
+                                $('#sms_input').val('');
+                            }
+                            $(this.button).addClass('ready');
+                            Popup._getBalance(this.box.parents('.popUp-slots_balance'), this.balance_data);
+                            $(window).trigger('balance.update');
+                        } else {
+                            $(this.button).addClass('poker_popup_close');
+                            var msg = (typeof data.message !== 'undefined' || data.message !== "") ? data.message : dictionary.slot_error_get_balance;
+                            alerts(dictionary.error, msg);
+                        }
+                    }
+                });
+
+            };
+
+            $('.balance-update').on('click', {balance_data: data}, function(event) {
+                var balance_data = event.data.balance_data;
+                Popup._getBalance($('.popUp-slots_balance'), balance_data);
+                $('.popUp-slots_balance').find('.ready').removeClass('ready').removeClass('poker_popup_close');
+            }).bind(this);
+
+            this._getBalance($('.popUp-slots_balance'), data);
+
+            $('.balance-to, .balance-from').on('click', {balance_data: data}, function(event) {
+                var amount = 0;
+                var $this = $(this);
+                var balance_data = event.data.balance_data;
+                var direction = $this.data('direction');
+                var box = $this.parents('.actions_block');
+                if ([323, 324].indexOf(parseInt(balance_data.product_id)) !== -1) {
+                    amount = box.find('.popup-change-sum').val();
+                } else {
+                    amount = $this.hasClass('balance-to') ? parseFloat(box.find('.real-val').text()) : box.find('.popup-change-sum').val();
+                }
+                Popup._setBalance($(this).parents('.actions_block'), balance_data, direction, amount);
+                $('.popUp-slots_balance').find('.ready').removeClass('ready');
+            });
+
+            $('.run_game').on('click', function() {
+                if (typeof (data.is_slot_page) !== 'undefined' && data.is_slot_page === true) {
+                    slotsPage.openPopup(data.index, true);
+                } else {
+                    $.arcticmodal('close');
+                }
+            });
+
+            var sms_sending = false;
+
+            $('#get_smscode_button').on('click', function() {
+                if (sms_sending) {
+                    return;
+                }
+
+                sms_sending = true;
+                $(this).removeClass('ready poker_popup_close').addClass('loading');
+                $.ajax({
+                    url: 'thirdparty/getsmscode',
+                    method: "GET",
+                    cache: false,
+                    dataType: 'json',
+                    button: this,
+                    data: {
+                        product_id: $('#get_smscode_button').data('product-id')
+                    }
+                }).done(function(result) {
+                    $(this.button).removeClass('loading');
+                    if (result.success) {
+                        $(this.button).addClass('ready');
+                        alerts(dictionary.message, result.message);
+                    } else {
+                        $(this.button).addClass('poker_popup_close');
+                        alerts(dictionary.error, result.message);
+                    }
+
+                }).always(function() {
+                    sms_sending = false;
+                });
+            });
+        };
+
+        return true;
+    },
+
+    wednesdayX2: function() {
+        return window.location.href.indexOf('landing-happy-friday') === -1;
+    },
+
+    happyFriday: function() {
+        return true;
+    },
+
+    beatUs: function() {
+        return true;
+    },
+
+    warningPopup: function() {
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+        return true;
+    },
+
+    cyberplat: function() {
+        return true;
+    },
+
+    olympicgames: function() {
+        return true;
+    },
+
+    lotteryOfChampions: function() {
+        return getRefId() === 65;
+    },
+
+    accountActivation: function() {
+        return true;
+    },
+
+    switchBonus: function(type) {
+        this.params_modal.overlay = {
+            css: {
+                backgroundColor: '#000',
+                opacity: .5,
+                zIndex: 1000
+            }
+        };
+        this.params_ajax.data = {
+            "type": "switchBonus",
+            "bonus": type[1]['bonus'],
+            "real": type[1]['real'],
+            "currency": type[1]['currency']
+        };
+        this.finalFunction = function() {
+
+        };
+
+        return true;
+    },
+
+    select_1st_deposit_bonus: function() {
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+
+        this.finalFunction = function() {
+            $('.bonuses-tabs__wrap').addClass('scrollbar-inner').scrollbar();
+
+            $('.bonus-box').on('click', function() {
+                var $this = $(this),
+                    $this_id = $this.attr('data-tab'),
+                    $tab = $('.bonuses-tabs__content'),
+                    $tab_wrap = $('.bonuses-tabs__wrap'),
+                    $tab_active = $('#' + $this_id),
+                    $tab_active_h = $tab_active.outerHeight(),
+                    $check = $this.find('.switcher__input');
+
+                if ($this.hasClass('active')) {
+                    return;
+                }
+
+                $tab.fadeOut(200);
+
+                $tab_wrap.stop().animate({
+                    height: $tab_active_h
+                }, 200, function() {
+                    $tab_wrap.height($tab_active_h);
+                    $('#' + $this_id).fadeIn(200);
+                });
+
+                $check.prop('checked', true);
+                $this.addClass('active').siblings().removeClass('active');
+            });
+
+            $('.btn-pay').on('click', function(e) {
+                e.preventDefault();
+                var $choice = $('.switcher__input:checked'),
+                    params = {choice: 0};
+
+                if (!$choice.length) {
+                    alerts('', dictionary['select_bonus_type'], 0);
+                    return;
+                }
+
+                params.choice = parseInt($choice.val());
+
+                $.ajax({
+                    url: 'office/bonuschoice',
+                    type: 'POST',
+                    data: $.param(params),
+                    success: function(response) {
+                        if (response['success']) {
+                            alerts(dictionary['message'], response['message'], 1);
+                            $('#select_1st_deposit_bonus').arcticmodal('close');
+                        } else {
+                            alerts('', dictionary['queryError'], 0);
+                        }
+                    }
+                });
+            });
+        };
+
+        return true;
+    },
+
+    saveUserBonusAgreeDecision: function(answer, bonus_offer_slide, popup_elem) {
+        $.ajax({
+            url: 'user/bonus',
+            type: 'POST',
+            data: 'answer=' + answer,
+            dataType: 'json',
+        }).done(function(responce) {
+            if (answer === 0) {
+                $('.user-money_balance.bonuses').remove()
+            }
+            var message = responce.Message;
+            alerts(bonus_offer_slide.dictionary.message, message, 2);
+            popup_elem.arcticmodal('close');
+        }).fail(function() {
+            Popup.unknownErrorPostReg(popup_elem);
+        });
+    },
+
+    unknownErrorPostReg: function(target) {
+        alerts(dictionary.error, dictionary.errorServer, 2);
+        target.find('.bonus_offer_preload').hide();
+    },
+
+    fastDeposit: function() {
+        return true;
+    },
+
+    players_popup: function (arg) {
+        this.params_modal.beforeClose = arg[1].beforeClose;
+        this.params_modal.afterOpen = arg[1].afterOpen;
+
+        return true;
+    },
+
+    set_callback: function () {
+        $.ajax({
+            url: 'user/requestcallbackdb',
+            type: 'POST',
+            data: $('#callbackCallForm').serialize(),
+            success: function(request) {
+                alerts(dictionary.message, request.message, 2);
+                if (request.success == true) {
+                    $('#support_question').arcticmodal('close');
+                }
+            }
+        });
+    },
+
+    /** Popup Бонус-экспресс для Казахстана **/
+    bonusExpress: function() {
+        return true;
+    },
+
+    reg_auth: function() {
+        return true;
+    },
+
+    camryLottery: function(){
+        return true;
+    },
+
+    union_accounts: function(){
+        this.params_modal.closeOnEsc = false;
+        this.params_modal.closeOnOverlayClick = false;
+
+        return true;
+    },
+
+    formatedFieldPnoneNumb: function () {
+        var field     = document.getElementById('addTelNum');
+        field.onkeyup = function () {
+            this.value = this.value.trim().replace(/\D/g, '');
+        };
+    }
+};

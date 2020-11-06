@@ -1,0 +1,15 @@
+
+<!-- saved from url=(0041)https://dbbridge.ru/res/ifs.html?strg=frm -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>Document</title>
+  <script type="text/javascript">
+  (function(a,b,c,d){function e(){var a='valuesStore';var c=function(d){var b=indexedDB.open('common_storage',1);b.onsuccess=function(){d(b.result);},b.onupgradeneeded=function(b){b.currentTarget.result.createObjectStore(a,{keyPath:'name'}),c(d,null);},b.onerror=function(a){d(null,'open DB failed');};};var d=function(b,d){c(function(c){d(c.transaction([a],b).objectStore(a));});};var b=function(e,b,f,d){c(function(h){var g=h.transaction([a],e).objectStore(a);var c=g[b].apply(g,f);c.onsuccess=function(){d(c.result,null);},c.onerror=function(a){d(null,'"'+b+'" failed: '+a);};});};return{setItem:function(a,c,d){b('readwrite','put',[{name:a,value:c}],function(a,b){d(a,b);});},getItem:function(c,a){b('readonly','get',[c],function(b,c){b&&b.name?a(b.value,c):a(null,c);});},removeItem:function(c,a){b('readwrite','delete',[c],function(b,c){b&&b.name?a(b.value,c):a(null,c);});},clear:function(a){b('readwrite','clear',[],function(b,c){a(b,c);});},filter:function(a,b){d('readwrite',function(d){var c={};d.openCursor().onsuccess=function(e){var d=e.target.result;d?(a(d.value.name)&&(c[d.value.name]=d.value.value),d.continue()):b(c);};});}};}function f(){var b=a.localStorage;return b?{setItem:function(a,c,d){setTimeout(function(){b.setItem(a,c),d();},0);},getItem:function(a,c){setTimeout(function(){c(b.getItem(a));},0);},removeItem:function(a,c){setTimeout(function(){b.removeItem(a),c();},0);},clear:function(a){setTimeout(function(){b.clear(),a();},0);},filter:function(a,c){setTimeout(function(){var e={};var d,f;for(d in b)f=b.getItem(d),a(d)&&(e[d]=f);c(e);},0);}}:null;}function g(){return'indexedDB'in window?e():f();}b=function(b){a.parent.postMessage(b,'*');},c=function(a,c){a.data.qid&&b({qid:a.data.qid,act:'dpmsi.storage',data:c});},d=function(c,e){var a=g();var f=null;var d=function(){e('ok');};switch(c.data.act){case'set':{vals=c.data.values;for(key in vals){if(!vals.hasOwnProperty(key))continue;typeof vals[key]!='string'&&(vals[key]=JSON.stringify(vals[key])),a.setItem(key,vals[key],d);}break;}case'get':{if(f={},keys=c.data.keys,typeof keys=='string')a.getItem(keys,function(a){e(a);});else{var b=function(c,d){c>=keys.length?d():a.getItem(keys[c],function(a){f[keys[c]]=a,b(c+1,d);});};b(0,function(){e(f);});}break;}case'removeItem':{if(keys=c.data.keys,typeof keys=='string')a.removeItem(keys,d);else{var b=function(c,d){c>=keys.length?d():a.removeItem(keys[c],function(){b(c+1,d);});};b(0,d);}break;}case'clear':{a.clear(d);break;}case'getItemsByPrefix':{var h=c.data.prefix;a.filter(function(a){return a.indexOf(h)>=0;},function(a){e(a);});}}},a.addEventListener('message',function(a){d(a,function(b){b&&c(a,b);});}),b('data','*');}(window));
+  </script>
+  <style type="text/css"></style>
+</head>
+<body data-new-gr-c-s-check-loaded="14.983.0">
+
+
+
+</body></html>

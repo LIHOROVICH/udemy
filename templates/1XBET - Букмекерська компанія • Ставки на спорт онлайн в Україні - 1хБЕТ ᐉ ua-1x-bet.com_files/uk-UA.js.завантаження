@@ -1,0 +1,155 @@
+window.__I18N__={"lng":"uk-UA","store":{"en-GB":{"translation":{"Начало":"Start","Конец":"End","Выберите...":"Select...","Отмена":"Cancel","OK":"OK","Выберите тему":"Choose theme","Слишком много запросов. Пожалуйста, повторите запрос позже":"Too many attempts. Please try again later","У вас не осталось попыток. Пожалуйста, повторите запрос позже":"No attempts left. Please try again later","Поле должно быть заполнено":"This field cannot be empty","Содержит недопустимые символы":"Contains invalid characters","Слабый пароль":"Weak password","Не совпадает с паролем":"Passwords do not match","Неверный временный код":"One-time passcode incorrect","Не менее {min} символов":"No fewer than {min} characters","Не более {max} символов":"No more than {max} characters","Задать вопрос":"Ask a question","Онлайн консультант":"Online consultant","Произошел разрыв соединения. Пожалуйста, перезагрузите страницу.":"Connection lost. Please regresh the page.","Консультант":"Consultant","Оценить работу":"Rate","Благодарим вас за оценку консультанта":"Thanks for rating","Оставьте отзыв о консультанте":"Give us feedback about a consultant","При установке соединения произошла ошибка":"Connection error","Отправить":"Send","Отсутствует соединение":"Not connected","Страница не найдена":"Page not found","На главную":"Go to home page","Что-то пошло не так":"Something went wrong","C уважением,":"Yours faithfully,","Подтверждение адреса электронной почты":"Confirm email address","Восстановление пароля":"Password recovery","Вход с неизвестного устройства":"Sign-in from an unknown device","Чтобы завершить регистрацию учетной записи, необходимо убедиться, что этот адрес электронной почты принадлежит вам.":"To complete registration, we need to ensure that this email address belongs to you.","Чтобы подтвердить свой адрес электронной почты, используйте этот код безопасности:":"To verify your email address, use this security code:","Если вы не запрашивали этот код, то можете просто проигнорировать это письмо. Кто-то мог сделать запрос на ваш адрес электронной почты по ошибке.":"If you did not request this code, please ignore this email. Someone may have entered your email address by mistake when requesting a code.","Используйте этот код, чтобы сбросить пароль для учетной записи":"Use this code to reset the password for your account","Ваш код восстановления пароля:":"Your password recovery code:","Попытка входа с неизвестного устройства заблокирована":"A sign-in attempt from an unknown device has been blocked","Обнаружен вход с неизвестного устройства":"A sign-in from an unknown device has been detected","Время":"Time","Местонахождение":"Location","Неизвестно":"Unknown","Устройство":"Device","Браузер":"Browser","Чтобы разблокировать вход с неизвестного устройства, необходимо подтвердить свое местонахождение при помощи этого кода безопасности:":"To unblock sign-in from an unknown device, you need to confirm your location using this security code:","Если вы не узнаете этот вход, срочно смените пароль и подключите двухфакторную аутентификацию!":"If you don't recognize this sign-in, change your password immediately and enable 2FA!","Если вы не узнаете этот вход, срочно смените пароль!":"If you don't recognize this sign-in, change your password immediately!","Закрыть":"Close","Отменить":"Cancel","Верификация аккаунта":"Account verification","Другое":"Other","Выберите тему обращения":"Select subject","Изменить оценку":"Change rating","{loaded} из {total}":"{loaded} of {total}","Отпустите мышку, чтобы загрузить файлы":"Drop the file here to upload it","Написать сообщение...":"Type a message...","Оператор ответит {from_time}":"The operator will reply {from_time}","Оператор скоро ответит":"The operator will reply as soon as possible","Платежи (депозиты и выводы)":"Payments (deposits and withdrawals)","Бонусы":"Bonuses","Игры (наличие, проблемы)":"Games (availability, queries)","Аккаунт":"Account","Сотрудничество":"Collaboration","Блокировка аккаунта":"Account blocking","Жалобы и предложения":"Queries and suggestions","Ваш запрос был отправлен. Мы обработаем ваш запрос и свяжемся с вами в ближайшее время.":"Your query has been sent. We will process it and get back to you shortly.","Если Вам не удалось найти ответ на свой вопрос, пожалуйста, напишите нам.":"If you couldn't find an answer to your question, please write to us.","Ваше имя":"First name","Ваш e-mail":"Your email address","Введите сообщение...":"Enter your message…","Не удалось отправить":"Failed to send","К сожалению, нам не удалось найти свободного оператора.":"Unfortunately, there are no operators available at the moment."," Вы можете найти ответ на свой вопрос здесь {link}.":" You can find an answer to your question here {link}."}},"uk-UA":{"translation":{"Начало":"Початок","Конец":"Кінець","Выберите...":"Оберіть...","Отмена":"Відміна","OK":"OK","Выберите тему":"Оберіть тему","Слишком много запросов. Пожалуйста, повторите запрос позже":"Занадто багато запитів. Будь ласка, повторіть запит пізніше","У вас не осталось попыток. Пожалуйста, повторите запрос позже":"У вас не залишилося спроб. Будь ласка, повторіть запит пізніше","Поле должно быть заполнено":"Поле має бути заповнено","Содержит недопустимые символы":"Містить неприпустимі символи","Слабый пароль":"Слабкий пароль","Не совпадает с паролем":"Не збігається з паролем","Неверный временный код":"Невірний тимчасовий код","Не менее {min} символов":"Не менш {min} символів","Не более {max} символов":"Не більше {max} символів","Задать вопрос":"Поставити запитання","Онлайн консультант":"Онлайн консультант","Произошел разрыв соединения. Пожалуйста, перезагрузите страницу.":"Відбувся розрив з'єднання. Будь ласка, перезавантажте сторінку.","Консультант":"Consultant","Оценить работу":"Оцінити роботу","Благодарим вас за оценку консультанта":"Дякуємо вам за оцінку консультанта","Оставьте отзыв о консультанте":"Станьте консультанта","При установке соединения произошла ошибка":"При установці з'єднання сталася помилка","Отправить":"Відправити","Отсутствует соединение":"Відсутня з'єднання","Страница не найдена":"Сторінка не знайдена","На главную":"На головну","Что-то пошло не так":"Щось пішло не так","C уважением,":"З повагою,","Подтверждение адреса электронной почты":"Підтвердження адреси електронної пошти","Восстановление пароля":"Відновлення пароля","Вход с неизвестного устройства":"Вхід з невідомого пристрою","Чтобы завершить регистрацию учетной записи, необходимо убедиться, что этот адрес электронной почты принадлежит вам.":"Щоб завершити реєстрацію облікового запису, необхідно переконатися, що ця адреса електронної пошти належить вам.","Чтобы подтвердить свой адрес электронной почты, используйте этот код безопасности:":"Щоб підтвердити свою адресу електронної пошти, використовуйте цей код безпеки:","Если вы не запрашивали этот код, то можете просто проигнорировать это письмо. Кто-то мог сделать запрос на ваш адрес электронной почты по ошибке.":"Якщо ви не запитували цей код, то можете просто проігнорувати цей лист. Хтось міг зробити запит на Вашу електронну адресу електронної пошти помилково.","Используйте этот код, чтобы сбросить пароль для учетной записи":"Використовуйте цей код, щоб скинути пароль для облікового запису","Ваш код восстановления пароля:":"Ваш код відновлення паролю:","Попытка входа с неизвестного устройства заблокирована":"Спроба входу з невідомого пристрою заблокована","Обнаружен вход с неизвестного устройства":"Виявлено вхід з невідомого пристрою","Время":"Час","Местонахождение":"Місцезнаходження","Неизвестно":"Невідомо","Устройство":"Пристрій","Браузер":"Браузер","Чтобы разблокировать вход с неизвестного устройства, необходимо подтвердить свое местонахождение при помощи этого кода безопасности:":"Щоб розблокувати вхід з невідомого пристрою, необхідно підтвердити своє місцезнаходження за допомогою цього коду безпеки:","Если вы не узнаете этот вход, срочно смените пароль и подключите двухфакторную аутентификацию!":"Якщо ви не впізнаєте цей вхід, терміново змініть пароль і підключіть двухфакторную аутентифікацію!","Если вы не узнаете этот вход, срочно смените пароль!":"Якщо ви не впізнаєте цей вхід, терміново змініть пароль!","Закрыть":"Закрити","Отменить":"Скасувати","Верификация аккаунта":"Верифікація аккаунта","Другое":"Інше","Выберите тему обращения":"Виберіть тему звернення","Изменить оценку":"Змінити оцінку","{loaded} из {total}":"{loaded} з {total}","Отпустите мышку, чтобы загрузить файлы":"Відпустіть мишку, щоб завантажити файли","Написать сообщение...":"Написати повідомлення ...","Оператор ответит {from_time}":"Оператор відповість {from_time}","Оператор скоро ответит":"Оператор скоро відповість","Платежи (депозиты и выводы)":"Платежі (депозити і виведення)","Бонусы":"Бонуси","Игры (наличие, проблемы)":"Ігри (наявність, проблеми)","Аккаунт":"Аккаунт","Сотрудничество":"Співробітництво","Блокировка аккаунта":"Блокування аккаунту","Жалобы и предложения":"Скарги і пропозиції","Ваш запрос был отправлен. Мы обработаем ваш запрос и свяжемся с вами в ближайшее время.":"Ваш запит був відправлений. Ми опрацюємо ваш запит і зв'яжемося з вами найближчим часом.","Если Вам не удалось найти ответ на свой вопрос, пожалуйста, напишите нам.":"Якщо Вам не вдалося знайти відповідь на своє питання, будь ласка, напишіть нам.","Ваше имя":"Ваше ім'я","Ваш e-mail":"Ваш e-mail ","Введите сообщение...":"Введіть повідомлення...","Не удалось отправить":"Не вдалося відправити","К сожалению, нам не удалось найти свободного оператора.":"На жаль, нам не вдалося знайти вільного оператора."," Вы можете найти ответ на свой вопрос здесь {link}.":" Ви можете знайти відповідь на своє питання тут {link}."}}}};
+window.initMomentLocale = function(){ //! moment.js locale configuration
+
+;(function (global, factory) {
+   typeof exports === 'object' && typeof module !== 'undefined'
+       && typeof require === 'function' ? factory(require('../moment')) :
+   typeof define === 'function' && define.amd ? define(['../moment'], factory) :
+   factory(global.moment)
+}(this, (function (moment) { 'use strict';
+
+
+    function plural(word, num) {
+        var forms = word.split('_');
+        return num % 10 === 1 && num % 100 !== 11 ? forms[0] : (num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20) ? forms[1] : forms[2]);
+    }
+    function relativeTimeWithPlural(number, withoutSuffix, key) {
+        var format = {
+            'ss': withoutSuffix ? 'секунда_секунди_секунд' : 'секунду_секунди_секунд',
+            'mm': withoutSuffix ? 'хвилина_хвилини_хвилин' : 'хвилину_хвилини_хвилин',
+            'hh': withoutSuffix ? 'година_години_годин' : 'годину_години_годин',
+            'dd': 'день_дні_днів',
+            'MM': 'місяць_місяці_місяців',
+            'yy': 'рік_роки_років'
+        };
+        if (key === 'm') {
+            return withoutSuffix ? 'хвилина' : 'хвилину';
+        }
+        else if (key === 'h') {
+            return withoutSuffix ? 'година' : 'годину';
+        }
+        else {
+            return number + ' ' + plural(format[key], +number);
+        }
+    }
+    function weekdaysCaseReplace(m, format) {
+        var weekdays = {
+            'nominative': 'неділя_понеділок_вівторок_середа_четвер_п’ятниця_субота'.split('_'),
+            'accusative': 'неділю_понеділок_вівторок_середу_четвер_п’ятницю_суботу'.split('_'),
+            'genitive': 'неділі_понеділка_вівторка_середи_четверга_п’ятниці_суботи'.split('_')
+        };
+
+        if (m === true) {
+            return weekdays['nominative'].slice(1, 7).concat(weekdays['nominative'].slice(0, 1));
+        }
+        if (!m) {
+            return weekdays['nominative'];
+        }
+
+        var nounCase = (/(\[[ВвУу]\]) ?dddd/).test(format) ?
+            'accusative' :
+            ((/\[?(?:минулої|наступної)? ?\] ?dddd/).test(format) ?
+                'genitive' :
+                'nominative');
+        return weekdays[nounCase][m.day()];
+    }
+    function processHoursFunction(str) {
+        return function () {
+            return str + 'о' + (this.hours() === 11 ? 'б' : '') + '] LT';
+        };
+    }
+
+    var uk = moment.defineLocale('uk', {
+        months : {
+            'format': 'січня_лютого_березня_квітня_травня_червня_липня_серпня_вересня_жовтня_листопада_грудня'.split('_'),
+            'standalone': 'січень_лютий_березень_квітень_травень_червень_липень_серпень_вересень_жовтень_листопад_грудень'.split('_')
+        },
+        monthsShort : 'січ_лют_бер_квіт_трав_черв_лип_серп_вер_жовт_лист_груд'.split('_'),
+        weekdays : weekdaysCaseReplace,
+        weekdaysShort : 'нд_пн_вт_ср_чт_пт_сб'.split('_'),
+        weekdaysMin : 'нд_пн_вт_ср_чт_пт_сб'.split('_'),
+        longDateFormat : {
+            LT : 'HH:mm',
+            LTS : 'HH:mm:ss',
+            L : 'DD.MM.YYYY',
+            LL : 'D MMMM YYYY р.',
+            LLL : 'D MMMM YYYY р., HH:mm',
+            LLLL : 'dddd, D MMMM YYYY р., HH:mm'
+        },
+        calendar : {
+            sameDay: processHoursFunction('[Сьогодні '),
+            nextDay: processHoursFunction('[Завтра '),
+            lastDay: processHoursFunction('[Вчора '),
+            nextWeek: processHoursFunction('[У] dddd ['),
+            lastWeek: function () {
+                switch (this.day()) {
+                    case 0:
+                    case 3:
+                    case 5:
+                    case 6:
+                        return processHoursFunction('[Минулої] dddd [').call(this);
+                    case 1:
+                    case 2:
+                    case 4:
+                        return processHoursFunction('[Минулого] dddd [').call(this);
+                }
+            },
+            sameElse: 'L'
+        },
+        relativeTime : {
+            future : 'за %s',
+            past : '%s тому',
+            s : 'декілька секунд',
+            ss : relativeTimeWithPlural,
+            m : relativeTimeWithPlural,
+            mm : relativeTimeWithPlural,
+            h : 'годину',
+            hh : relativeTimeWithPlural,
+            d : 'день',
+            dd : relativeTimeWithPlural,
+            M : 'місяць',
+            MM : relativeTimeWithPlural,
+            y : 'рік',
+            yy : relativeTimeWithPlural
+        },
+        // M. E.: those two are virtually unused but a user might want to implement them for his/her website for some reason
+        meridiemParse: /ночі|ранку|дня|вечора/,
+        isPM: function (input) {
+            return /^(дня|вечора)$/.test(input);
+        },
+        meridiem : function (hour, minute, isLower) {
+            if (hour < 4) {
+                return 'ночі';
+            } else if (hour < 12) {
+                return 'ранку';
+            } else if (hour < 17) {
+                return 'дня';
+            } else {
+                return 'вечора';
+            }
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}-(й|го)/,
+        ordinal: function (number, period) {
+            switch (period) {
+                case 'M':
+                case 'd':
+                case 'DDD':
+                case 'w':
+                case 'W':
+                    return number + '-й';
+                case 'D':
+                    return number + '-го';
+                default:
+                    return number;
+            }
+        },
+        week : {
+            dow : 1, // Monday is the first day of the week.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
+        }
+    });
+
+    return uk;
+
+})));
+ }

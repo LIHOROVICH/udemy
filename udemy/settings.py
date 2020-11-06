@@ -55,7 +55,8 @@ ROOT_URLCONF = 'udemy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates',],
+        'DIRS': [#'templates', 
+        'udemy/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
